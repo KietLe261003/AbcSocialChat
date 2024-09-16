@@ -54,7 +54,7 @@ public class resgiter extends AppCompatActivity {
         loginButon=findViewById(R.id.loginbutton);
         rg_username=findViewById(R.id.rgusername);
         rg_email=findViewById(R.id.rgemail);
-        rg_password=findViewById(R.id.rgepassword);
+        rg_password=findViewById(R.id.rgpassword);
         rg_epassword=findViewById(R.id.rgepassword);
         signupButon=findViewById(R.id.signupbutton);
         rg_imageProfile=findViewById(R.id.profilerg0);
@@ -84,17 +84,17 @@ public class resgiter extends AppCompatActivity {
                 else if(!email.matches(emailPattern))
                 {
                     progressDialog.dismiss();
-                    rg_email.setText("Type a valid email here");
+                    rg_email.setError("Type a valid email here");
                 }
                 else if(pass.length()<6)
                 {
                     progressDialog.dismiss();
-                    rg_password.setText("Password must be 6 character or more");
+                    rg_password.setError("Password must be 6 character or more");
                 }
                 else if(!pass.equals(cpass))
                 {
                     progressDialog.dismiss();
-                    rg_password.setText("The password doesn't match");
+                    rg_epassword.setError("The password doesn't match");
                 }
                 else
                 {
