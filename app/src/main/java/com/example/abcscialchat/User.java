@@ -1,17 +1,27 @@
 package com.example.abcscialchat;
 
 public class User {
-    String profilePic,userName,password,userId,lastMessage,status;
+    String profilePic,userName,password,userId,lastMessage,status,email;
     public User(){}
 
-    public User(String profilePic, String userName, String password, String userId, String lastMessage, String status) {
+    public User(String profilePic, String userName, String password, String userId, String status, String email) {
         this.profilePic = profilePic;
         this.userName = userName;
         this.password = password;
         this.userId = userId;
-        this.lastMessage = lastMessage;
         this.status = status;
+        this.email = email;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+
 
     public String getProfilePic() {
         return profilePic;
