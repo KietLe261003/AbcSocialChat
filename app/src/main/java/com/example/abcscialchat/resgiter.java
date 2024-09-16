@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,10 +41,14 @@ public class resgiter extends AppCompatActivity {
     String emailPattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
     FirebaseDatabase database;
     FirebaseStorage storage;
+    ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resgiter);
+        progressDialog= new ProgressDialog(this);
+        progressDialog.setMessage("Create the account");
+        progressDialog.setCancelable(false);
         database=FirebaseDatabase.getInstance();
         storage=FirebaseStorage.getInstance();
         loginButon=findViewById(R.id.loginbutton);
@@ -54,6 +59,7 @@ public class resgiter extends AppCompatActivity {
         signupButon=findViewById(R.id.signupbutton);
         rg_imageProfile=findViewById(R.id.profilerg0);
         auth=FirebaseAuth.getInstance();
+
         loginButon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,18 +78,22 @@ public class resgiter extends AppCompatActivity {
                 String status = "Hello world";
                 if(TextUtils.isEmpty(userName) || TextUtils.isEmpty(email) || TextUtils.isEmpty(pass) || TextUtils.isEmpty(cpass))
                 {
+                    progressDialog.dismiss();
                     Toast.makeText(resgiter.this, "Please Enter valid Information", Toast.LENGTH_SHORT).show();
                 }
                 else if(!email.matches(emailPattern))
                 {
+                    progressDialog.dismiss();
                     rg_email.setText("Type a valid email here");
                 }
                 else if(pass.length()<6)
                 {
+                    progressDialog.dismiss();
                     rg_password.setText("Password must be 6 character or more");
                 }
                 else if(!pass.equals(cpass))
                 {
+                    progressDialog.dismiss();
                     rg_password.setText("The password doesn't match");
                 }
                 else
@@ -113,6 +123,7 @@ public class resgiter extends AppCompatActivity {
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 if(task.isComplete())
                                                                 {
+                                                                    progressDialog.show();
                                                                     Intent it = new Intent(resgiter.this,MainActivity.class);
                                                                     startActivity(it);
                                                                     finish();
@@ -139,6 +150,7 @@ public class resgiter extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isComplete())
                                             {
+                                                progressDialog.show();
                                                 Intent it = new Intent(resgiter.this,MainActivity.class);
                                                 startActivity(it);
                                                 finish();
