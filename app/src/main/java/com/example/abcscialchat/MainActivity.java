@@ -5,9 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -24,14 +28,20 @@ public class MainActivity extends AppCompatActivity {
     UserAdapter adapter;
     FirebaseDatabase database;
     ArrayList<User> userArrayList;
+    ImageView logoutimg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        auth=FirebaseAuth.getInstance();
+        if(auth.getCurrentUser()==null)
+        {
+            Intent it = new Intent(MainActivity.this,login.class);
+            startActivity(it);
+        }
 
         //Cấu hình biến Database
         database=FirebaseDatabase.getInstance();
-        auth=FirebaseAuth.getInstance();
         DatabaseReference reference= database.getReference().child("user");// trỏ tới bảng user trong database
         userArrayList= new ArrayList<>();
         reference.addValueEventListener(new ValueEventListener() {
@@ -55,12 +65,34 @@ public class MainActivity extends AppCompatActivity {
         mainUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter= new UserAdapter(MainActivity.this,userArrayList);
         mainUserRecyclerView.setAdapter(adapter);
+        logoutimg=findViewById(R.id.logoutimg);
+
+        logoutimg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dialog dialog = new Dialog(MainActivity.this,R.style.dialoge);
+                dialog.setContentView(R.layout.dialog_layout);
+                Button btnYes,btnNo;
+                btnYes=dialog.findViewById(R.id.btnYes);
+                btnNo=dialog.findViewById(R.id.btnNo);
+                btnYes.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        FirebaseAuth.getInstance().signOut();
+                        Intent it = new Intent(MainActivity.this,login.class);
+                        startActivity(it);
+                    }
+                });
+                btnNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
+        });
 
 
-        if(auth.getCurrentUser()==null)
-        {
-            Intent it = new Intent(MainActivity.this,login.class);
-            startActivity(it);
-        }
     }
 }

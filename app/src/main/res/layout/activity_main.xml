@@ -33,6 +33,7 @@
             android:textStyle="bold" />
 
         <ImageView
+            android:id="@+id/logoutimg"
             android:layout_width="@dimen/_26sdp"
             android:layout_height="@dimen/_26sdp"
             android:layout_gravity="center"

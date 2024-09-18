@@ -1,5 +1,6 @@
 package com.example.abcscialchat;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,10 +32,23 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.viewholder> {
 
     @Override
     public void onBindViewHolder(@NonNull UserAdapter.viewholder holder, int position) {
+        //gán dữ liệu cho user item
         User user = userArrayList.get(position);
         holder.username.setText(user.userName);
         holder.userstatus.setText(user.status);
         Picasso.get().load(user.profilePic).into(holder.userimg);
+
+        //Xử lý sư kiện khi nhấn vào item
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(mainActivity, chatWin.class);
+                it.putExtra("name",user.getUserName());
+                it.putExtra("reciverImg",user.getProfilePic());
+                it.putExtra("uid",user.getUserId());
+                mainActivity.startActivity(it);
+            }
+        });
     }
 
     @Override
