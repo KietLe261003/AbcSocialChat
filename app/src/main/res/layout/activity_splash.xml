@@ -9,15 +9,15 @@
 
     <ImageView
         android:id="@+id/logoimg"
-        android:layout_width="@dimen/_168sdp"
-        android:layout_height="@dimen/_84sdp"
+        android:layout_width="240dp"
+        android:layout_height="209dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.276"
-        app:srcCompat="@drawable/av" />
+        app:layout_constraintVertical_bias="0.057"
+        app:srcCompat="@drawable/logo" />
 
     <TextView
         android:id="@+id/logonameimg"
@@ -33,7 +33,7 @@
         app:layout_constraintHorizontal_bias="0.518"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.527" />
+        app:layout_constraintVertical_bias="0.465" />
 
     <TextView
         android:id="@+id/ownone"
