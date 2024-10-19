@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
                     User user = dataSnapshot.getValue(User.class);
                     userArrayList.add(user);
                 }
+                Log.d("Data", "onDataChange: "+userArrayList.size());
                 adapter.notifyDataSetChanged();
             }
             @Override
