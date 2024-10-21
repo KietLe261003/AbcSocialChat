@@ -1,6 +1,7 @@
 package com.example.abcscialchat;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -30,6 +32,8 @@ public class blogAdapter extends RecyclerView.Adapter {
     public blogAdapter(Context context, ArrayList<blog> blogAdapterArratList) {
         this.context = context;
         this.blogAdapterArratList = blogAdapterArratList;
+        this.database = FirebaseDatabase.getInstance();  // Khởi tạo FirebaseDatabase
+        this.auth = FirebaseAuth.getInstance();
     }
 
     @NonNull
@@ -47,8 +51,12 @@ public class blogAdapter extends RecyclerView.Adapter {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d("DataUser",""+snapshot.getValue().toString());
+                String userName=snapshot.child("userName").getValue().toString();
+                String profilePic=snapshot.child("profilePic").getValue().toString();
+                Picasso.get().load(profilePic).into(viewHoler.circleImageView);
+                Picasso.get().load(blogUser.getImage()).into(viewHoler.imgPost);
                 viewHoler.nameUser.setText(snapshot.child("userName").getValue().toString());
-                viewHoler.circleImageView.setImageResource(Integer.parseInt(snapshot.child("profilePic").getValue().toString()));
                 viewHoler.timeCreate.setText(blogUser.getTimeCreate()+"");
                 viewHoler.contentPost.setText(blogUser.getContent());
                 viewHoler.shareCount.setText(blogUser.getShares().size()+"");
@@ -66,7 +74,7 @@ public class blogAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return 0;
+        return blogAdapterArratList.size();
     }
     class blogViewHolder extends RecyclerView.ViewHolder {
         CircleImageView circleImageView;

@@ -116,23 +116,21 @@ public class CreateBlog extends AppCompatActivity {
                                 String idUser=auth.getUid();
                                 ArrayList<comment> comments = new ArrayList<>();
                                 ArrayList<share> shares = new ArrayList<>();
-                                DatabaseReference reference= database.getReference().child("blogs").child(idUser).child("blog");
                                 blog blog = new blog(idUser,content,imageUrl,comments,shares,0,System.currentTimeMillis(),System.currentTimeMillis());
                                 progressDialog.dismiss();
-                                reference.setValue(blog).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                database=FirebaseDatabase.getInstance();
+                                database.getReference().child("blogs").child(idUser).push().setValue(blog).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if(task.isComplete())
                                         {
-                                            progressDialog.show();
                                             Toast.makeText(CreateBlog.this, "Đăng bài thành công", Toast.LENGTH_SHORT).show();
                                             Intent it = new Intent(CreateBlog.this,HomeActivity.class);
                                             startActivity(it);
                                             finish();
                                         }
-                                        else
-                                        {
-                                            Toast.makeText(CreateBlog.this, "Error for Creating the blog", Toast.LENGTH_SHORT).show();
+                                        else {
+                                            Toast.makeText(CreateBlog.this, "Đăng bài khong thành công", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
