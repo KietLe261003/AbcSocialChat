@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     UserAdapter adapter;
     FirebaseDatabase database;
     ArrayList<User> userArrayList;
-    ImageView logoutimg;
+    ImageView logoutimg,createBlog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +39,16 @@ public class MainActivity extends AppCompatActivity {
             Intent it = new Intent(MainActivity.this,login.class);
             startActivity(it);
         }
+
+        createBlog=findViewById(R.id.createBlog);
+        createBlog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(MainActivity.this,CreateBlog.class);
+                startActivity(it);
+                finish();
+            }
+        });
 
         //Cấu hình biến Database
         database=FirebaseDatabase.getInstance();

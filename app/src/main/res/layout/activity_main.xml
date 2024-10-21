@@ -63,6 +63,7 @@
         android:gravity="center">
 
         <ImageView
+            android:id="@+id/createBlog"
             android:layout_width="41dp"
             android:layout_height="48dp"
             android:src="@drawable/camera"

@@ -10,10 +10,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class splash extends AppCompatActivity {
     ImageView logo;
     TextView logoname, own1, own2;
     Animation topAnim, bottomAnim;
+    FirebaseAuth auth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,6 +25,7 @@ public class splash extends AppCompatActivity {
         logoname=findViewById(R.id.logonameimg);
         own1=findViewById(R.id.ownone);
         own2=findViewById(R.id.owntwo);
+        auth=FirebaseAuth.getInstance();
 
         topAnim= AnimationUtils.loadAnimation(this,R.anim.top_animation);
         bottomAnim=AnimationUtils.loadAnimation(this,R.anim.bottom_animation);
@@ -33,6 +37,12 @@ public class splash extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (auth.getCurrentUser() != null) {
+                    Intent intent = new Intent(splash.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
                 Intent it = new Intent(splash.this,login.class);
                 startActivity(it);
             }

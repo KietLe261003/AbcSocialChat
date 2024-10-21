@@ -29,6 +29,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/nameuser"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Quoc Trung"
@@ -37,6 +38,7 @@
                 android:textColor="#000000" />
 
             <TextView
+                android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="52 minutes ago"
@@ -57,6 +59,7 @@
 
     <!-- Post Image -->
     <ImageView
+        android:id="@+id/imgPost"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:src="@drawable/itachi"
@@ -65,6 +68,7 @@
 
     <!-- Post Text -->
     <TextView
+        android:id="@+id/contentPost"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Bo may se huy diet mindx hay cho di dcm chung may"
@@ -94,6 +98,7 @@
                 android:src="@drawable/ic_share" />
 
             <TextView
+                android:id="@+id/shareCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="36"
@@ -122,6 +127,7 @@
                 android:src="@drawable/ic_like" />
 
             <TextView
+                android:id="@+id/likeCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="85"
@@ -144,6 +150,7 @@
                 android:src="@drawable/ic_comment"/>
 
             <TextView
+                android:id="@+id/commentCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="12"
