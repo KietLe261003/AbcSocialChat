@@ -1,0 +1,41 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@drawable/not_rounded_toolbar"
+    tools:context=".FriendsActivity">
+
+    <!-- TabLayout để chọn các tab chức năng -->
+
+    <!-- ViewPager2 để chứa nội dung của từng tab -->
+
+    <EditText
+        android:id="@+id/search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_background"
+        android:hint="Search friends"
+        android:padding="12dp" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/rounded_background_2"
+        android:textColor="@color/black"
+        app:layout_anchor="@+id/search_bar"
+        app:layout_anchorGravity="center" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -16,6 +16,24 @@
             android:name=".CreateBlog"
             android:exported="false" />
         <activity
+            android:name=".FriendsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FriendRequestsFragment"
+            android:exported="false" />
+        <activity
+            android:name=".FriendsListFragment"
+            android:exported="false" />
+        <activity
+            android:name=".FriendRequestAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".FriendsPagerAdapter"
+            android:exported="false" />
+        <activity
+            android:name=".AddFriendsFragment"
+            android:exported="false" />
+        <activity
             android:name=".HomeActivity"
             android:exported="false" />
         <activity

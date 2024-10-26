@@ -34,6 +34,7 @@ public class HomeActivity extends AppCompatActivity {
     private ImageView logoutImageView;
     private RecyclerView mainBlogRecyclerView;
     private ImageView cameraImageView;
+    private ImageView addFriend;
     private ImageView chatImageView;
     private ImageView settingsImageView;
     blogAdapter adapter;
@@ -49,6 +50,15 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent it = new Intent(HomeActivity.this,CreateBlog.class);
+                startActivity(it);
+                finish();
+            }
+        });
+        addFriend = findViewById(R.id.addFriend);
+        addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(HomeActivity.this, FriendsActivity.class);
                 startActivity(it);
                 finish();
             }
@@ -99,6 +109,6 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-
     }
+
 }

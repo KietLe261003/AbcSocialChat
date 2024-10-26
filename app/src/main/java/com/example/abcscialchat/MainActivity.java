@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     UserAdapter adapter;
     FirebaseDatabase database;
     ArrayList<User> userArrayList;
-    ImageView logoutimg,createBlog;
+    ImageView logoutimg,createBlog, addFriend;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +45,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent it = new Intent(MainActivity.this,CreateBlog.class);
+                startActivity(it);
+                finish();
+            }
+        });
+        addFriend = findViewById(R.id.addFriend);
+        addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(MainActivity.this, FriendsActivity.class);
                 startActivity(it);
                 finish();
             }
@@ -103,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-
-
     }
+
 }
