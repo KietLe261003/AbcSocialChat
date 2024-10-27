@@ -119,27 +119,76 @@ public class FriendsActivity extends AppCompatActivity {
         });
     }
 
-    private void loadFriendsList() {
-        friendsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<String> friendsList = new ArrayList<>();
-                for (DataSnapshot friendSnapshot : snapshot.getChildren()) {
-                    Boolean status = friendSnapshot.child("status").getValue(Boolean.class);
-                    if (status != null && status) {
-                        String friendName = friendSnapshot.getKey();
-                        friendsList.add(friendName);
+//    private void loadFriendsList() {
+//        friendsRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                ArrayList<String> friendsList = new ArrayList<>();
+//                for (DataSnapshot friendSnapshot : snapshot.getChildren()) {
+//                    String friendName = friendSnapshot.getValue(String.class);
+//                    DatabaseReference nameUser = FirebaseDatabase.getInstance().getReference("user").child(friendName);
+//                    nameUser.addValueEventListener(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                            friendsList.clear();
+//                            for (DataSnapshot i : snapshot.getChildren()){
+//                                //String tmp = i.child("userName").getValue(String.class);
+//                                User user = i.getValue(User.class);
+//
+//                                if(user.getUserName() != null)
+//                                {
+//                                    friendsList.add(user.getUserName());
+//                                }
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(@NonNull DatabaseError error) {
+//
+//                        }
+//                    });
+//                }
+//                friendsAdapter.updateFriendsList(friendsList);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Toast.makeText(FriendsActivity.this, "Lỗi khi tải danh sách bạn bè", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
+private void loadFriendsList() {
+    friendsRef.addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            ArrayList<String> friendsList = new ArrayList<>();
+            for (DataSnapshot friendSnapshot : snapshot.getChildren()) {
+                String friendId = friendSnapshot.getKey();
+                usersRef.child(friendId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                        String friendName = userSnapshot.child("userName").getValue(String.class);
+                        if (friendName != null) {
+                            friendsList.add(friendName);
+                            friendsAdapter.updateFriendsList(friendsList);
+                        }
                     }
-                }
-                friendsAdapter.updateFriendsList(friendsList);
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(FriendsActivity.this, "Error loading friends list", Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(FriendsActivity.this, "Error loading friend name", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-        });
-    }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+            Toast.makeText(FriendsActivity.this, "Error loading friends list", Toast.LENGTH_SHORT).show();
+        }
+    });
+}
+
 
 
 
@@ -147,7 +196,7 @@ public class FriendsActivity extends AppCompatActivity {
         friendRequestsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<String> requestsList = new ArrayList<>();
+                requestsList.clear();
                 for (DataSnapshot requestSnapshot : snapshot.getChildren()) {
                     String requesterId = requestSnapshot.getKey();
                     usersRef.child(requesterId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -157,6 +206,7 @@ public class FriendsActivity extends AppCompatActivity {
                             if (requesterName != null) {
                                 requestsList.add(requesterName);
                                 requestsAdapter.updateRequestsList(requestsList);
+                                requestsAdapter.notifyDataSetChanged();
                             }
                         }
 
@@ -174,6 +224,7 @@ public class FriendsActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void searchForFriends(String query) {
         Query searchQuery = usersRef.orderByChild("userName").startAt(query).endAt(query + "\uf8ff");
@@ -232,6 +283,9 @@ public class FriendsActivity extends AppCompatActivity {
         });
     }
 
+    // Khai báo biến requestsList toàn cục trong lớp FriendsActivity
+    private ArrayList<String> requestsList = new ArrayList<>();
+
     private void acceptFriendRequest(String friendName) {
         Query query = usersRef.orderByChild("userName").equalTo(friendName);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -240,17 +294,30 @@ public class FriendsActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                         String friendId = userSnapshot.getKey();
+                        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        String currentUserName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
 
-                        // Xóa lời mời kết bạn sau khi chấp nhận
+                        // Kiểm tra nếu currentUserName là null để tránh lỗi
+                        if (currentUserName == null) {
+                            currentUserName = "Người dùng";
+                        }
+
+                        // Xóa yêu cầu kết bạn khỏi Firebase
                         friendRequestsRef.child(friendId).removeValue();
 
-                        // Thêm bạn bè vào bảng "friends"
-                        Map<String, Object> friendData = new HashMap<>();
-                        friendData.put("status", true);
+                        // Xóa yêu cầu kết bạn khỏi danh sách requestsList
+                        requestsList.remove(friendName);
 
-                        friendsRef.child(friendId).setValue(friendData);
-                        DatabaseReference friendRef = FirebaseDatabase.getInstance().getReference("friends").child(friendId);
-                        friendRef.child(currentUserId).setValue(friendData);
+                        // Cập nhật adapter sau khi danh sách requestsList đã thay đổi
+                        requestsAdapter.updateRequestsList(requestsList);
+                        requestsAdapter.notifyDataSetChanged();
+
+                        // Lưu bạn bè vào Firebase
+                        DatabaseReference currentUserFriendsRef = friendsRef.child(friendId);
+                        currentUserFriendsRef.setValue(friendName);
+
+                        DatabaseReference friendFriendsRef = FirebaseDatabase.getInstance().getReference("friends").child(friendId);
+                        friendFriendsRef.child(currentUserId).setValue(currentUserName);
 
                         Toast.makeText(FriendsActivity.this, "Bạn đã chấp nhận kết bạn với " + friendName, Toast.LENGTH_SHORT).show();
                     }
@@ -265,6 +332,9 @@ public class FriendsActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
 
 
 
