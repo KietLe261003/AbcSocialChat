@@ -28,11 +28,21 @@ public class MainActivity extends AppCompatActivity {
     UserAdapter adapter;
     FirebaseDatabase database;
     ArrayList<User> userArrayList;
-    ImageView logoutimg,createBlog, addFriend;
+    ImageView logoutimg,createBlog;
+    private ImageView addFriend;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        addFriend = findViewById(R.id.addFriend);
+        addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(MainActivity.this, FriendsActivity.class);
+                startActivity(it);
+            }
+        });
+
         auth=FirebaseAuth.getInstance();
         if(auth.getCurrentUser()==null)
         {
@@ -46,16 +56,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent it = new Intent(MainActivity.this,CreateBlog.class);
                 startActivity(it);
-                finish();
-            }
-        });
-        addFriend = findViewById(R.id.addFriend);
-        addFriend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent it = new Intent(MainActivity.this, FriendsActivity.class);
-                startActivity(it);
-                finish();
             }
         });
 
@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
         database=FirebaseDatabase.getInstance();
         DatabaseReference reference= database.getReference().child("user");// trỏ tới bảng user trong database
         userArrayList= new ArrayList<>();
+        User AIChat = new User("https://firebasestorage.googleapis.com/v0/b/socialchat-9ff4d.appspot.com/o/AI.png?alt=media&token=7898f80b-c87a-4585-b802-e48523d95504","ChatAIBox","1","1","1","1");
+        userArrayList.add(AIChat);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -112,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-    }
 
+
+    }
 }

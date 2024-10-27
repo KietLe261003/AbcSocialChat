@@ -46,6 +46,8 @@ public class HomeActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
         cameraImageView=findViewById(R.id.ic_cam);
+        addFriend = findViewById(R.id.addFriend);
+        chatImageView=findViewById(R.id.ic_chat);
         cameraImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -54,11 +56,18 @@ public class HomeActivity extends AppCompatActivity {
                 finish();
             }
         });
-        addFriend = findViewById(R.id.addFriend);
         addFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent it = new Intent(HomeActivity.this, FriendsActivity.class);
+                startActivity(it);
+                finish();
+            }
+        });
+        chatImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(HomeActivity.this,MainActivity.class);
                 startActivity(it);
                 finish();
             }

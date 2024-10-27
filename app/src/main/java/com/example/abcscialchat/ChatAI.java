@@ -1,7 +1,7 @@
 package com.example.abcscialchat;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,8 +17,15 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.ai.client.generativeai.GenerativeModel;
+import com.google.ai.client.generativeai.java.GenerativeModelFutures;
+import com.google.ai.client.generativeai.type.Content;
+import com.google.ai.client.generativeai.type.GenerateContentResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,12 +34,26 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
-public class chatWin extends AppCompatActivity {
+public class ChatAI extends AppCompatActivity {
     String reciverImg,reciverUid,reciverName,senderUid;
     CircleImageView profileImg;
     TextView rcName;
@@ -46,20 +67,21 @@ public class chatWin extends AppCompatActivity {
     RecyclerView msgadapter;
     ArrayList<msgModelClass> messagesList;
     messageAdapter messageAdapter;
+
+    //Cấu hình biến gửi dữ liệu
+    public static final MediaType JSON
+            = MediaType.get("application/json; charset=utf-8");
+    OkHttpClient client = new OkHttpClient();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_chat_win);
+        setContentView(R.layout.activity_chat_ai);
         //Cấu hình biến cơ sở dữ liệu
         database=FirebaseDatabase.getInstance();
         auth=FirebaseAuth.getInstance();
 
-        //Cấu hình dữ liệu gửi từ mainactivity
-        reciverName= getIntent().getStringExtra("name");
-        reciverImg=getIntent().getStringExtra("reciverImg");
-        reciverUid=getIntent().getStringExtra("uid");
-
+        //Khởi tạo list dữ liệu chat
         messagesList= new ArrayList<>();
 
         // Cấu hình adapter
@@ -67,7 +89,7 @@ public class chatWin extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager= new LinearLayoutManager(this);
         linearLayoutManager.setStackFromEnd(true);
         msgadapter.setLayoutManager(linearLayoutManager);
-        messageAdapter= new messageAdapter(chatWin.this,messagesList);
+        messageAdapter= new messageAdapter(ChatAI.this,messagesList);
         msgadapter.setAdapter(messageAdapter);
 
         //Cấu hình biến sử dụng
@@ -75,15 +97,15 @@ public class chatWin extends AppCompatActivity {
         rcName=findViewById(R.id.reciverName);
         btnSend=findViewById(R.id.btnSend);
         edtMsg=findViewById(R.id.edtWrite);
-        Picasso.get().load(reciverImg).into(profileImg);
-        rcName.setText(""+reciverName);
+        Picasso.get()
+                .load("https://firebasestorage.googleapis.com/v0/b/socialchat-9ff4d.appspot.com/o/AI.png?alt=media&token=7898f80b-c87a-4585-b802-e48523d95504")
+                .into(profileImg);
+        rcName.setText("Chat AI");
         senderUid=auth.getUid();
 
-
-        senderRoom=senderUid+reciverUid; //lấy id phòng của người gửi
-        reciverRoom=reciverUid+senderUid; //lấy id phòng của người được gửi
+        //Lấy dữ liệu
         DatabaseReference reference= database.getReference().child("user").child(auth.getUid());
-        DatabaseReference chatReference = database.getReference().child("chats").child(senderRoom).child("messages"); //lấy tin nhắn
+        DatabaseReference chatReference = database.getReference().child("AIChat").child(auth.getUid()).child("messages");
         chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -94,7 +116,6 @@ public class chatWin extends AppCompatActivity {
                     messagesList.add(message);
                 }
                 messageAdapter.notifyDataSetChanged();
-                msgadapter.scrollToPosition(messagesList.size() - 1);
             }
 
             @Override
@@ -102,14 +123,13 @@ public class chatWin extends AppCompatActivity {
 
             }
         });
+
         // lấy hình ảnh của người gửi và hình ảnh của người được gửi
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 senderImg=snapshot.child("profilePic").getValue().toString();
-                reciverIImg=reciverImg;
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -123,27 +143,57 @@ public class chatWin extends AppCompatActivity {
                 String msg=edtMsg.getText().toString();
                 if (msg.isEmpty())
                 {
-                    Toast.makeText(chatWin.this, "Enter the first message", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatAI.this, "Enter the first message", Toast.LENGTH_SHORT).show();
                 }
                 edtMsg.setText("");
                 Date date= new Date();
                 msgModelClass msgModelClass= new msgModelClass(msg,senderUid,date.getTime());
                 database=FirebaseDatabase.getInstance();
-                database.getReference().child("chats").child(senderRoom).child("messages").push()
+                database.getReference().child("AIChat").child(senderUid).child("messages").push()
                         .setValue(msgModelClass).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                database.getReference().child("chats").child(reciverRoom).child("messages").push()
-                                        .setValue(msgModelClass).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-
-                                            }
-                                        });
+                                callApi(msg,senderUid);
                             }
                         });
             }
         });
-
     }
+    void callApi(String question,String senderUid){
+        // Specify a Gemini model appropriate for your use case
+        GenerativeModel gm =
+                new GenerativeModel("gemini-1.5-flash","Your key");
+        GenerativeModelFutures model = GenerativeModelFutures.from(gm);
+
+        Content content =
+                new Content.Builder().addText(question).build();
+        Executor executor = Executors.newSingleThreadExecutor();
+
+        ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
+        Futures.addCallback(
+                response,
+                new FutureCallback<GenerateContentResponse>() {
+                    @Override
+                    public void onSuccess(GenerateContentResponse result) {
+                        String resultText = result.getText();
+                        Date date= new Date();
+                        msgModelClass msgAI= new msgModelClass(resultText,"AI CHAT",date.getTime());
+                        database.getReference().child("AIChat").child(senderUid).child("messages").push()
+                                .setValue(msgAI).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+
+                                    }
+                                });
+                        Log.d("Res",resultText);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        t.printStackTrace();
+                    }
+                },
+                executor);
+    }
+
 }

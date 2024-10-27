@@ -75,7 +75,8 @@
             android:layout_width="41dp"
             android:layout_height="48dp"
             android:src="@drawable/chat_flat"
-            android:background="@drawable/rounded_background"            android:elevation="6dp"
+            android:background="@drawable/rounded_background"
+            android:elevation="6dp"
             android:layout_margin="8dp" />
 
         <ImageView

@@ -43,7 +43,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mainBlogRecyclerView"
         android:layout_width="wrap_content"
-        android:layout_height="381dp"
+        android:layout_height="462dp"
         android:layout_below="@+id/toolBar"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
@@ -60,7 +60,8 @@
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:gravity="center">
+        android:gravity="center"
+        android:paddingBottom="45dp">
 
         <ImageView
             android:id="@+id/ic_cam"
@@ -72,10 +73,12 @@
             android:layout_margin="8dp" />
 
         <ImageView
+            android:id="@+id/ic_chat"
             android:layout_width="41dp"
             android:layout_height="48dp"
             android:src="@drawable/chat_flat"
-            android:background="@drawable/rounded_background"            android:elevation="6dp"
+            android:background="@drawable/rounded_background"
+            android:elevation="6dp"
             android:layout_margin="8dp" />
 
         <ImageView

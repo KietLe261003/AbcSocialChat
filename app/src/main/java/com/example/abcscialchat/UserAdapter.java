@@ -42,11 +42,20 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.viewholder> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent it = new Intent(mainActivity, chatWin.class);
-                it.putExtra("name",user.getUserName());
-                it.putExtra("reciverImg",user.getProfilePic());
-                it.putExtra("uid",user.getUserId());
-                mainActivity.startActivity(it);
+                if(user.getProfilePic()=="https://firebasestorage.googleapis.com/v0/b/socialchat-9ff4d.appspot.com/o/AI.png?alt=media&token=7898f80b-c87a-4585-b802-e48523d95504")
+                {
+                    Intent it = new Intent(mainActivity, ChatAI.class);
+                    mainActivity.startActivity(it);
+                }
+                else
+                {
+                    Intent it = new Intent(mainActivity, chatWin.class);
+                    it.putExtra("name",user.getUserName());
+                    it.putExtra("reciverImg",user.getProfilePic());
+                    it.putExtra("uid",user.getUserId());
+                    mainActivity.startActivity(it);
+                }
+
             }
         });
     }
