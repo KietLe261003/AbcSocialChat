@@ -33,10 +33,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView appNameTextView;
     private ImageView logoutImageView;
     private RecyclerView mainBlogRecyclerView;
-    private ImageView cameraImageView;
-    private ImageView addFriend;
-    private ImageView chatImageView;
-    private ImageView settingsImageView;
+    private ImageView cameraImageView,addFriend,chatImageView,profileImageView;
     blogAdapter adapter;
     ArrayList<blog> blogArrayList;
     FirebaseDatabase database;
@@ -48,37 +45,14 @@ public class HomeActivity extends AppCompatActivity {
         cameraImageView=findViewById(R.id.ic_cam);
         addFriend = findViewById(R.id.addFriend);
         chatImageView=findViewById(R.id.ic_chat);
-        cameraImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent it = new Intent(HomeActivity.this,CreateBlog.class);
-                startActivity(it);
-                finish();
-            }
-        });
-        addFriend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent it = new Intent(HomeActivity.this, FriendsActivity.class);
-                startActivity(it);
-                finish();
-            }
-        });
-        chatImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent it = new Intent(HomeActivity.this,MainActivity.class);
-                startActivity(it);
-                finish();
-            }
-        });
+        profileImageView=findViewById(R.id.ic_profile);
         auth= FirebaseAuth.getInstance();
         if(auth.getCurrentUser()==null)
         {
             Intent it = new Intent(HomeActivity.this,login.class);
             startActivity(it);
         }
-
+        initNavigate();
 
 
         //Cấu hình biến Database
@@ -118,6 +92,42 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+    }
+    public void initNavigate(){
+        if(auth.getCurrentUser()==null)
+        {
+            Intent it = new Intent(HomeActivity.this,login.class);
+            startActivity(it);
+        }
+        cameraImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(HomeActivity.this,CreateBlog.class);
+                startActivity(it);
+            }
+        });
+        addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(HomeActivity.this, FriendsActivity.class);
+                startActivity(it);
+            }
+        });
+        chatImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(HomeActivity.this,MainActivity.class);
+                startActivity(it);
+            }
+        });
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(HomeActivity.this, Profile.class);
+                it.putExtra("idUser",auth.getCurrentUser().getUid());
+                startActivity(it);
+            }
+        });
     }
 
 }

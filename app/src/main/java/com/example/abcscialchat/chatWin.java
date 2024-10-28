@@ -3,6 +3,7 @@ package com.example.abcscialchat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +35,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class chatWin extends AppCompatActivity {
     String reciverImg,reciverUid,reciverName,senderUid;
+    Button btnProfile;
     CircleImageView profileImg;
     TextView rcName;
     CardView btnSend;
@@ -51,6 +53,9 @@ public class chatWin extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chat_win);
+        btnProfile=findViewById(R.id.btn_Profile);
+
+
         //Cấu hình biến cơ sở dữ liệu
         database=FirebaseDatabase.getInstance();
         auth=FirebaseAuth.getInstance();
@@ -59,7 +64,14 @@ public class chatWin extends AppCompatActivity {
         reciverName= getIntent().getStringExtra("name");
         reciverImg=getIntent().getStringExtra("reciverImg");
         reciverUid=getIntent().getStringExtra("uid");
-
+        btnProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(chatWin.this, Profile.class);
+                it.putExtra("idUser",reciverUid);
+                startActivity(it);
+            }
+        });
         messagesList= new ArrayList<>();
 
         // Cấu hình adapter

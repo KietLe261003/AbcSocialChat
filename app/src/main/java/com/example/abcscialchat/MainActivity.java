@@ -28,36 +28,23 @@ public class MainActivity extends AppCompatActivity {
     UserAdapter adapter;
     FirebaseDatabase database;
     ArrayList<User> userArrayList;
-    ImageView logoutimg,createBlog;
+    ImageView logoutimg,cameraImageView,chatImageView,profileImageView;
     private ImageView addFriend;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        cameraImageView=findViewById(R.id.ic_cam);
         addFriend = findViewById(R.id.addFriend);
-        addFriend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent it = new Intent(MainActivity.this, FriendsActivity.class);
-                startActivity(it);
-            }
-        });
-
+        chatImageView=findViewById(R.id.ic_chat);
+        profileImageView=findViewById(R.id.ic_profile);
         auth=FirebaseAuth.getInstance();
         if(auth.getCurrentUser()==null)
         {
             Intent it = new Intent(MainActivity.this,login.class);
             startActivity(it);
         }
-
-        createBlog=findViewById(R.id.createBlog);
-        createBlog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent it = new Intent(MainActivity.this,CreateBlog.class);
-                startActivity(it);
-            }
-        });
+        initNavigate();
 
         //Cấu hình biến Database
         database=FirebaseDatabase.getInstance();
@@ -114,7 +101,42 @@ public class MainActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-
-
+    }
+    public void initNavigate(){
+        if(auth.getCurrentUser()==null)
+        {
+            Intent it = new Intent(MainActivity.this,login.class);
+            startActivity(it);
+        }
+        cameraImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(MainActivity.this,CreateBlog.class);
+                startActivity(it);
+            }
+        });
+        addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(MainActivity.this, FriendsActivity.class);
+                startActivity(it);
+            }
+        });
+        chatImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(MainActivity.this,MainActivity.class);
+                startActivity(it);
+                finish();
+            }
+        });
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(MainActivity.this, Profile.class);
+                it.putExtra("idUser",auth.getCurrentUser().getUid());
+                startActivity(it);
+            }
+        });
     }
 }
