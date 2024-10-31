@@ -81,7 +81,7 @@ public class login extends AppCompatActivity {
                             {
                                 progressDialog.show();
                                 try {
-                                    Intent it = new Intent(login.this,MainActivity.class);
+                                    Intent it = new Intent(login.this,HomeActivity.class);
                                     startActivity(it);
                                     finish();
                                 }catch (Exception e){

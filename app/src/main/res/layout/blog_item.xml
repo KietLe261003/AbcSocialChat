@@ -43,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:text="52 minutes ago"
                 android:textSize="12sp"
-                android:textColor="#8E8E8E" />
+                android:textColor="@color/white" />
         </LinearLayout>
 
         <!-- Follow Button -->
@@ -71,9 +71,9 @@
         android:id="@+id/contentPost"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Bo may se huy diet mindx hay cho di dcm chung may"
+        android:text="Content blog"
         android:textSize="14sp"
-        android:textColor="#6B6B6B"
+        android:textColor="@color/black"
         android:layout_marginTop="8dp"
         android:lineSpacingExtra="4dp" />
 

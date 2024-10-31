@@ -1,9 +1,13 @@
 package com.example.abcscialchat;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,11 +31,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class HomeActivity extends AppCompatActivity {
     FirebaseAuth auth;
     private TextView appNameTextView;
-    private ImageView logoutImageView;
+    private ImageView logoutimg;
     private RecyclerView mainBlogRecyclerView;
     private ImageView cameraImageView,addFriend,chatImageView,profileImageView;
     blogAdapter adapter;
@@ -53,7 +59,33 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(it);
         }
         initNavigate();
+        logoutimg=findViewById(R.id.logoutimg);
 
+        logoutimg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dialog dialog = new Dialog(HomeActivity.this,R.style.dialoge);
+                dialog.setContentView(R.layout.dialog_layout);
+                Button btnYes,btnNo;
+                btnYes=dialog.findViewById(R.id.btnYes);
+                btnNo=dialog.findViewById(R.id.btnNo);
+                btnYes.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        FirebaseAuth.getInstance().signOut();
+                        Intent it = new Intent(HomeActivity.this,login.class);
+                        startActivity(it);
+                    }
+                });
+                btnNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+            }
+        });
 
         //Cấu hình biến Database
         database=FirebaseDatabase.getInstance();
@@ -63,25 +95,31 @@ public class HomeActivity extends AppCompatActivity {
         adapter = new blogAdapter(HomeActivity.this,blogArrayList);
         mainBlogRecyclerView.setAdapter(adapter);
 
-        DatabaseReference reference= database.getReference().child("blogs").child(auth.getUid());
+        DatabaseReference reference= database.getReference().child("blogs");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot:snapshot.getChildren())
                 {
-                    //Log.d("Datablog",""+dataSnapshot.getValue().toString());
-                    blog dtblog = dataSnapshot.getValue(blog.class);
-
-                    // Kiểm tra nếu comments và shares không tồn tại thì khởi tạo mảng rỗng
-                    if (dtblog.getComments() == null) {
-                        dtblog.setComments(new ArrayList<comment>());
+                    for (DataSnapshot blogSnapshot : dataSnapshot.getChildren()) {
+                        blog dtblog = blogSnapshot.getValue(blog.class);
+                        // Kiểm tra nếu comments và shares không tồn tại thì khởi tạo mảng rỗng
+                        if (dtblog.getComments() == null) {
+                            dtblog.setComments(new ArrayList<comment>());
+                        }
+                        if (dtblog.getShares() == null) {
+                            dtblog.setShares(new ArrayList<share>());
+                        }
+                        blogArrayList.add(dtblog);
                     }
-                    if (dtblog.getShares() == null) {
-                        dtblog.setShares(new ArrayList<share>());
-                    }
 
-                    blogArrayList.add(dtblog);
                 }
+                Collections.sort(blogArrayList, new Comparator<blog>() {
+                    @Override
+                    public int compare(blog b1, blog b2) {
+                        return Long.compare(b2.getTimeCreate(), b1.getTimeCreate()); 
+                    }
+                });
                 Log.d("Data", "onDataChange: "+blogArrayList.size());
                 adapter.notifyDataSetChanged();
             }

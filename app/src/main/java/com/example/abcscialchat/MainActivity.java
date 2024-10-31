@@ -46,10 +46,15 @@ public class MainActivity extends AppCompatActivity {
         }
         initNavigate();
 
+        //Cấu hình biến sử dụng bình thường
+        userArrayList=new ArrayList<>();
+        mainUserRecyclerView=findViewById(R.id.mainUserRecyclerView);
+        mainUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter= new UserAdapter(MainActivity.this,userArrayList);
+        mainUserRecyclerView.setAdapter(adapter);
         //Cấu hình biến Database
         database=FirebaseDatabase.getInstance();
-        DatabaseReference reference= database.getReference().child("user");// trỏ tới bảng user trong database
-        userArrayList= new ArrayList<>();
+        DatabaseReference reference= database.getInstance().getReference("friends").child(auth.getCurrentUser().getUid());// trỏ tới bảng user trong database
         User AIChat = new User("https://firebasestorage.googleapis.com/v0/b/socialchat-9ff4d.appspot.com/o/AI.png?alt=media&token=7898f80b-c87a-4585-b802-e48523d95504","ChatAIBox","1","1","1","1");
         userArrayList.add(AIChat);
         reference.addValueEventListener(new ValueEventListener() {
@@ -57,8 +62,22 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot:snapshot.getChildren())
                 {
-                    User user = dataSnapshot.getValue(User.class);
-                    userArrayList.add(user);
+                    String friendId = dataSnapshot.getKey();
+                    DatabaseReference friendFriendsRef = FirebaseDatabase.getInstance().getReference("user")
+                            .child(friendId);
+                    friendFriendsRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            User user = snapshot.getValue(User.class);
+                            userArrayList.add(user);
+                            adapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                 }
                 Log.d("Data", "onDataChange: "+userArrayList.size());
                 adapter.notifyDataSetChanged();
@@ -69,11 +88,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Cấu hình biến sử dụng bình thường
-        mainUserRecyclerView=findViewById(R.id.mainUserRecyclerView);
-        mainUserRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter= new UserAdapter(MainActivity.this,userArrayList);
-        mainUserRecyclerView.setAdapter(adapter);
+
         logoutimg=findViewById(R.id.logoutimg);
 
         logoutimg.setOnClickListener(new View.OnClickListener() {

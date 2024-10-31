@@ -317,7 +317,20 @@ private void loadFriendsList() {
                         currentUserFriendsRef.setValue(friendName);
 
                         DatabaseReference friendFriendsRef = FirebaseDatabase.getInstance().getReference("friends").child(friendId);
-                        friendFriendsRef.child(currentUserId).setValue(currentUserName);
+                        DatabaseReference CurrentName=FirebaseDatabase.getInstance().getReference("user").child(currentUserId);
+                        CurrentName.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                String name= snapshot.child("userName").getValue().toString();
+                                friendFriendsRef.child(currentUserId).setValue(name);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+
 
                         Toast.makeText(FriendsActivity.this, "Bạn đã chấp nhận kết bạn với " + friendName, Toast.LENGTH_SHORT).show();
                     }

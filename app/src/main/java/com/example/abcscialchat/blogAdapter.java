@@ -20,7 +20,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -57,7 +59,7 @@ public class blogAdapter extends RecyclerView.Adapter {
                 Picasso.get().load(profilePic).into(viewHoler.circleImageView);
                 Picasso.get().load(blogUser.getImage()).into(viewHoler.imgPost);
                 viewHoler.nameUser.setText(snapshot.child("userName").getValue().toString());
-                viewHoler.timeCreate.setText(blogUser.getTimeCreate()+"");
+                viewHoler.timeCreate.setText(formatMillisToDate(blogUser.getTimeCreate())+"");
                 viewHoler.contentPost.setText(blogUser.getContent());
                 viewHoler.shareCount.setText(blogUser.getShares().size()+"");
                 viewHoler.likeCount.setText(blogUser.getLike()+"");
@@ -70,6 +72,11 @@ public class blogAdapter extends RecyclerView.Adapter {
             }
         });
 
+    }
+    public static String formatMillisToDate(long millis) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date(millis);
+        return sdf.format(date);
     }
 
     @Override
