@@ -43,6 +43,26 @@
             android:text="Profile"
             android:layout_margin="13.00dp"/>
     </LinearLayout>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnSendImage"
+        android:layout_width="40dp"
+        android:layout_height="45.50dp"
+        android:background="@color/Cream"
+        app:cardCornerRadius="32.50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/btnSend"
+      android:layout_marginTop="600dp"
+        >
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:background="@drawable/camera"/>
+    </androidx.cardview.widget.CardView>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/msgadapter"

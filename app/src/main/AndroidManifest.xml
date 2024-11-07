@@ -34,6 +34,9 @@
             android:name=".resgiter"
             android:exported="false" />
         <activity
+            android:name=".SelectImageActivity"
+            android:exported="false" />
+        <activity
             android:name=".splash"
             android:exported="true">
             <intent-filter>

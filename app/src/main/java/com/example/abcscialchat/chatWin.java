@@ -1,24 +1,22 @@
 package com.example.abcscialchat;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +24,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -34,128 +34,123 @@ import java.util.Date;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class chatWin extends AppCompatActivity {
-    String reciverImg,reciverUid,reciverName,senderUid;
-    Button btnProfile;
-    CircleImageView profileImg;
-    TextView rcName;
-    CardView btnSend;
-    EditText edtMsg;
-    FirebaseAuth auth;
-    FirebaseDatabase database;
+    private String reciverImg, reciverUid, reciverName, senderUid;
+    private CircleImageView profileImg;
+    private TextView rcName;
+    private CardView btnSend, btnSendImage;
+    private EditText edtMsg;
+    private FirebaseAuth auth;
+    private FirebaseDatabase database;
     public static String senderImg;
     public static String reciverIImg;
-    String senderRoom, reciverRoom;
-    RecyclerView msgadapter;
-    ArrayList<msgModelClass> messagesList;
-    messageAdapter messageAdapter;
+    private String senderRoom, reciverRoom;
+    private RecyclerView msgadapter;
+    private ArrayList<msgModelClass> messagesList;
+    private messageAdapter messageAdapter;
+
+    private static final int SELECT_IMAGE_REQUEST_CODE = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chat_win);
-        btnProfile=findViewById(R.id.btn_Profile);
 
+        // Initialize Firebase database and authentication
+        database = FirebaseDatabase.getInstance();
+        auth = FirebaseAuth.getInstance();
 
-        //Cấu hình biến cơ sở dữ liệu
-        database=FirebaseDatabase.getInstance();
-        auth=FirebaseAuth.getInstance();
+        // Retrieve data from the intent
+        reciverName = getIntent().getStringExtra("name");
+        reciverImg = getIntent().getStringExtra("reciverImg");
+        reciverUid = getIntent().getStringExtra("uid");
 
-        //Cấu hình dữ liệu gửi từ mainactivity
-        reciverName= getIntent().getStringExtra("name");
-        reciverImg=getIntent().getStringExtra("reciverImg");
-        reciverUid=getIntent().getStringExtra("uid");
-        btnProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent it = new Intent(chatWin.this, Profile.class);
-                it.putExtra("idUser",reciverUid);
-                startActivity(it);
-            }
-        });
-        messagesList= new ArrayList<>();
+        // Initialize views
+        profileImg = findViewById(R.id.profileImg);
+        rcName = findViewById(R.id.reciverName);
+        btnSend = findViewById(R.id.btnSend);
+        edtMsg = findViewById(R.id.edtWrite);
+        btnSendImage = findViewById(R.id.btnSendImage);
+        msgadapter = findViewById(R.id.msgadapter);
 
-        // Cấu hình adapter
-        msgadapter=findViewById(R.id.msgadapter);
-        LinearLayoutManager linearLayoutManager= new LinearLayoutManager(this);
-        linearLayoutManager.setStackFromEnd(true);
-        msgadapter.setLayoutManager(linearLayoutManager);
-        messageAdapter= new messageAdapter(chatWin.this,messagesList);
+        // Set up RecyclerView
+        messagesList = new ArrayList<>();
+        messageAdapter = new messageAdapter(chatWin.this, messagesList);
+        msgadapter.setLayoutManager(new LinearLayoutManager(this));
         msgadapter.setAdapter(messageAdapter);
 
-        //Cấu hình biến sử dụng
-        profileImg=findViewById(R.id.profileImg);
-        rcName=findViewById(R.id.reciverName);
-        btnSend=findViewById(R.id.btnSend);
-        edtMsg=findViewById(R.id.edtWrite);
+        // Load receiver's profile image and name
         Picasso.get().load(reciverImg).into(profileImg);
-        rcName.setText(""+reciverName);
-        senderUid=auth.getUid();
+        rcName.setText(reciverName);
+        senderUid = auth.getUid();
 
+        senderRoom = senderUid + reciverUid;
+        reciverRoom = reciverUid + senderUid;
 
-        senderRoom=senderUid+reciverUid; //lấy id phòng của người gửi
-        reciverRoom=reciverUid+senderUid; //lấy id phòng của người được gửi
-        DatabaseReference reference= database.getReference().child("user").child(auth.getUid());
-        DatabaseReference chatReference = database.getReference().child("chats").child(senderRoom).child("messages"); //lấy tin nhắn
+        // Load messages from Firebase
+        DatabaseReference chatReference = database.getReference().child("chats").child(senderRoom).child("messages");
         chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 messagesList.clear();
-                for (DataSnapshot dataSnapshot:snapshot.getChildren())
-                {
-                    msgModelClass message=dataSnapshot.getValue(msgModelClass.class);
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    msgModelClass message = dataSnapshot.getValue(msgModelClass.class);
                     messagesList.add(message);
                 }
                 messageAdapter.notifyDataSetChanged();
-                msgadapter.scrollToPosition(messagesList.size() - 1);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        // lấy hình ảnh của người gửi và hình ảnh của người được gửi
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                senderImg=snapshot.child("profilePic").getValue().toString();
-                reciverIImg=reciverImg;
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(chatWin.this, "Failed to load messages.", Toast.LENGTH_SHORT).show();
             }
         });
 
-        //Xử lý nút ấn gửi
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String msg=edtMsg.getText().toString();
-                if (msg.isEmpty())
-                {
-                    Toast.makeText(chatWin.this, "Enter the first message", Toast.LENGTH_SHORT).show();
-                }
-                edtMsg.setText("");
-                Date date= new Date();
-                msgModelClass msgModelClass= new msgModelClass(msg,senderUid,date.getTime());
-                database=FirebaseDatabase.getInstance();
-                database.getReference().child("chats").child(senderRoom).child("messages").push()
-                        .setValue(msgModelClass).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                database.getReference().child("chats").child(reciverRoom).child("messages").push()
-                                        .setValue(msgModelClass).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-
-                                            }
-                                        });
-                            }
-                        });
+        // Send text message
+        btnSend.setOnClickListener(view -> {
+            String msg = edtMsg.getText().toString();
+            if (msg.isEmpty()) {
+                Toast.makeText(chatWin.this, "Enter the first message", Toast.LENGTH_SHORT).show();
+                return;
             }
+            edtMsg.setText("");
+            Date date = new Date();
+            msgModelClass msgModelClass = new msgModelClass(msg, senderUid, date.getTime());
+            sendMessage(msgModelClass);
         });
 
+        // Open SelectImageActivity to choose an image
+        btnSendImage.setOnClickListener(view -> {
+            Intent intent = new Intent(chatWin.this, SelectImageActivity.class);
+            startActivityForResult(intent, SELECT_IMAGE_REQUEST_CODE);
+        });
+    }
+
+    // Handle the selected image result
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SELECT_IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Uri selectedImageUri = data.getData();
+            if (selectedImageUri != null) {
+                sendImageMessage(selectedImageUri.toString());
+            }
+        }
+    }
+
+    // Method to send a text message
+    private void sendMessage(msgModelClass message) {
+        DatabaseReference messageRef = database.getReference().child("chats").child(senderRoom).child("messages");
+        messageRef.push().setValue(message).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                database.getReference().child("chats").child(reciverRoom).child("messages").push().setValue(message);
+            }
+        });
+    }
+
+    // Method to send an image message
+    private void sendImageMessage(String imageUrl) {
+        Date date = new Date();
+        msgModelClass imageMessage = new msgModelClass(imageUrl, senderUid, date.getTime(), true); // `true` could indicate it's an image message
+        sendMessage(imageMessage);
     }
 }
