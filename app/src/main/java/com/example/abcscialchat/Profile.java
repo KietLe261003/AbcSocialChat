@@ -2,6 +2,8 @@ package com.example.abcscialchat;
 
 import static com.example.abcscialchat.chatWin.senderImg;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,7 +22,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
+import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -29,9 +36,10 @@ public class Profile extends AppCompatActivity {
     private TextView txtName, txtHandle, mediaShared, viewAll;
     private ImageView imgIconChat, imgIconVideo, imgIconCall, imgIconMore;
     private RecyclerView mediaRecyclerView;
-    Button btnSaveName,btnSaveEmailAddress,btnSaveAddress,btnSavePhoneNumber;
+    Button btnSaveName,btnSaveEmailAddress,btnSaveAddress,btnSavePhoneNumber,btnChangeAvatar;
     FirebaseDatabase database;
     FirebaseAuth auth;
+    private static final int SELECT_IMAGE_REQUEST_CODE = 2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +56,7 @@ public class Profile extends AppCompatActivity {
         emailAddress = findViewById(R.id.email_address);
         address = findViewById(R.id.address);
         phoneNumber = findViewById(R.id.phone_number);
+        btnChangeAvatar=findViewById(R.id.changeAvatar);
         viewAll = findViewById(R.id.view_all);
 
         // Mapping action icons
@@ -70,12 +79,14 @@ public class Profile extends AppCompatActivity {
             btnSaveEmailAddress.setVisibility(View.VISIBLE);
             btnSaveAddress.setVisibility(View.VISIBLE);
             btnSavePhoneNumber.setVisibility(View.VISIBLE);
+            btnChangeAvatar.setVisibility(View.VISIBLE);
         } else {
             // Hide save buttons if it's a different user's profile
             btnSaveName.setVisibility(View.GONE);
             btnSaveEmailAddress.setVisibility(View.GONE);
             btnSaveAddress.setVisibility(View.GONE);
             btnSavePhoneNumber.setVisibility(View.GONE);
+            btnChangeAvatar.setVisibility(View.GONE);
             displayName.setEnabled(false);
             emailAddress.setEnabled(false);
             address.setEnabled(false);
@@ -86,6 +97,10 @@ public class Profile extends AppCompatActivity {
         btnSaveEmailAddress.setOnClickListener(view -> saveField(emailAddress, "email", idProfile));
         btnSaveAddress.setOnClickListener(view -> saveField(address, "address", idProfile));
         btnSavePhoneNumber.setOnClickListener(view -> saveField(phoneNumber, "phone", idProfile));
+        btnChangeAvatar.setOnClickListener(view -> {
+            Intent intent = new Intent(Profile.this, SelectImageActivity.class);
+            startActivityForResult(intent, SELECT_IMAGE_REQUEST_CODE);
+        });
     }
     private void saveField(EditText editText, String field, String idProfile) {
         if (editText.isEnabled()) {
@@ -141,5 +156,26 @@ public class Profile extends AppCompatActivity {
                     }
                 });
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SELECT_IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Uri selectedImageUri = data.getData();
+            if (selectedImageUri != null) {
+                // Gọi phương thức uploadAvatar để tải ảnh lên Firebase và cập nhật avatar
+                //uploadAvatar(selectedImageUri.toString(), auth.getCurrentUser().getUid());
+                // Cập nhật URL avatar vào Firebase Realtime Database
+                database.getReference("user").child(auth.getCurrentUser().getUid()).child("profilePic").setValue(selectedImageUri.toString())
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(Profile.this, "Avatar updated successfully!", Toast.LENGTH_SHORT).show();
+                                // Cập nhật ảnh hiển thị trong giao diện
+                                Picasso.get().load(selectedImageUri.toString()).into(profileImg);
+                            } else {
+                                Toast.makeText(Profile.this, "Failed to update avatar in database", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        }
+    }
 }
