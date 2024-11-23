@@ -116,6 +116,7 @@ public class ChatAI extends AppCompatActivity {
                     messagesList.add(message);
                 }
                 messageAdapter.notifyDataSetChanged();
+                msgadapter.scrollToPosition(messagesList.size() - 1);
             }
 
             @Override
@@ -154,6 +155,7 @@ public class ChatAI extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 callApi(msg,senderUid);
+                                msgadapter.scrollToPosition(messagesList.size() - 1);
                             }
                         });
             }
@@ -162,7 +164,7 @@ public class ChatAI extends AppCompatActivity {
     void callApi(String question,String senderUid){
         // Specify a Gemini model appropriate for your use case
         GenerativeModel gm =
-                new GenerativeModel("gemini-1.5-flash","Your key");
+                new GenerativeModel("gemini-1.5-flash","");
         GenerativeModelFutures model = GenerativeModelFutures.from(gm);
 
         Content content =

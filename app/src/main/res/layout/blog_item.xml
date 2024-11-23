@@ -122,9 +122,10 @@
             android:layout_marginStart="16dp">
 
             <ImageView
+                android:id="@+id/ic_like"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_like" />
+                android:src="@drawable/ic_like_selector" />
 
             <TextView
                 android:id="@+id/likeCount"
@@ -145,6 +146,7 @@
             android:layout_marginStart="16dp">
 
             <ImageView
+                android:id="@+id/ic_comment"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_comment"/>

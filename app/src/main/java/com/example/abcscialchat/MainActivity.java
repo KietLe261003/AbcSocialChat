@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     UserAdapter adapter;
     FirebaseDatabase database;
     ArrayList<User> userArrayList;
-    ImageView logoutimg,cameraImageView,chatImageView,profileImageView;
+    ImageView logoutimg,cameraImageView,chatImageView,profileImageView,homeImageView;
     private ImageView addFriend;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         addFriend = findViewById(R.id.addFriend);
         chatImageView=findViewById(R.id.ic_chat);
         profileImageView=findViewById(R.id.ic_profile);
+        homeImageView=findViewById(R.id.ic_home);
         auth=FirebaseAuth.getInstance();
         if(auth.getCurrentUser()==null)
         {
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         database=FirebaseDatabase.getInstance();
         DatabaseReference reference= database.getInstance().getReference("friends").child(auth.getCurrentUser().getUid());// trỏ tới bảng user trong database
         User AIChat = new User("https://firebasestorage.googleapis.com/v0/b/socialchat-9ff4d.appspot.com/o/AI.png?alt=media&token=7898f80b-c87a-4585-b802-e48523d95504","ChatAIBox","1","1","1","1");
-        //userArrayList.add(AIChat);
+        userArrayList.add(AIChat);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -123,6 +124,13 @@ public class MainActivity extends AppCompatActivity {
             Intent it = new Intent(MainActivity.this,login.class);
             startActivity(it);
         }
+        homeImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(MainActivity.this,HomeActivity.class);
+                startActivity(it);
+            }
+        });
         cameraImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

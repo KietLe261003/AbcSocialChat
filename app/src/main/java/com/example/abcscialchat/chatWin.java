@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,7 +55,6 @@ public class chatWin extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_win);
-
         // Initialize Firebase database and authentication
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
@@ -64,6 +64,7 @@ public class chatWin extends AppCompatActivity {
         reciverImg = getIntent().getStringExtra("reciverImg");
         reciverUid = getIntent().getStringExtra("uid");
 
+
         // Initialize views
         profileImg = findViewById(R.id.profileImg);
         rcName = findViewById(R.id.reciverName);
@@ -71,6 +72,15 @@ public class chatWin extends AppCompatActivity {
         edtMsg = findViewById(R.id.edtWrite);
         btnSendImage = findViewById(R.id.btnSendImage);
         msgadapter = findViewById(R.id.msgadapter);
+
+        rcName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(chatWin.this, Profile.class);
+                it.putExtra("idUser",reciverUid);
+                startActivity(it);
+            }
+        });
 
         // Set up RecyclerView
         messagesList = new ArrayList<>();
@@ -97,6 +107,7 @@ public class chatWin extends AppCompatActivity {
                     messagesList.add(message);
                 }
                 messageAdapter.notifyDataSetChanged();
+                msgadapter.scrollToPosition(messagesList.size() - 1);
             }
 
             @Override
@@ -104,7 +115,19 @@ public class chatWin extends AppCompatActivity {
                 Toast.makeText(chatWin.this, "Failed to load messages.", Toast.LENGTH_SHORT).show();
             }
         });
+        //Lay hinh anh
+        DatabaseReference reference= database.getReference().child("user").child(auth.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                senderImg=snapshot.child("profilePic").getValue().toString();
+                reciverIImg=reciverImg;
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
         // Send text message
         btnSend.setOnClickListener(view -> {
             String msg = edtMsg.getText().toString();
@@ -143,6 +166,7 @@ public class chatWin extends AppCompatActivity {
         messageRef.push().setValue(message).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 database.getReference().child("chats").child(reciverRoom).child("messages").push().setValue(message);
+                msgadapter.scrollToPosition(messagesList.size() - 1);
             }
         });
     }

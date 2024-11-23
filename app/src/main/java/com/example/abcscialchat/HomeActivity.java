@@ -39,7 +39,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView appNameTextView;
     private ImageView logoutimg;
     private RecyclerView mainBlogRecyclerView;
-    private ImageView cameraImageView,addFriend,chatImageView,profileImageView;
+    private ImageView cameraImageView,addFriend,chatImageView,profileImageView,homeImageView;
     blogAdapter adapter;
     ArrayList<blog> blogArrayList;
     FirebaseDatabase database;
@@ -52,6 +52,7 @@ public class HomeActivity extends AppCompatActivity {
         addFriend = findViewById(R.id.addFriend);
         chatImageView=findViewById(R.id.ic_chat);
         profileImageView=findViewById(R.id.ic_profile);
+        homeImageView=findViewById(R.id.ic_home);
         auth= FirebaseAuth.getInstance();
         if(auth.getCurrentUser()==null)
         {
@@ -99,6 +100,7 @@ public class HomeActivity extends AppCompatActivity {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                blogArrayList.clear();
                 for (DataSnapshot dataSnapshot:snapshot.getChildren())
                 {
                     for (DataSnapshot blogSnapshot : dataSnapshot.getChildren()) {
@@ -137,6 +139,7 @@ public class HomeActivity extends AppCompatActivity {
             Intent it = new Intent(HomeActivity.this,login.class);
             startActivity(it);
         }
+
         cameraImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

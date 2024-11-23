@@ -3,6 +3,7 @@ package com.example.abcscialchat.entity;
 import java.util.ArrayList;
 
 public class blog {
+    String id;
     String uid;
     String content;
     String image;
@@ -23,6 +24,14 @@ public class blog {
         this.like = like;
         this.timeCreate = timeCreate;
         this.timeUpdate = timeUpdate;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUid() {

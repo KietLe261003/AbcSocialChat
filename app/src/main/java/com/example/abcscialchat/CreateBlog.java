@@ -106,36 +106,41 @@ public class CreateBlog extends AppCompatActivity {
     // Hàm upload hình ảnh lên Firebase
     private void uploadImageToFirebase() {
         if (imageUri != null) {
-            StorageReference fileReference = storageReference.child(System.currentTimeMillis()
-                    + ".jpg");  // Tạo tên file ngẫu nhiên dựa trên thời gian hiện tại
+            StorageReference fileReference = storageReference.child(System.currentTimeMillis() + ".jpg");  // Tạo tên file ngẫu nhiên dựa trên thời gian hiện tại
             fileReference.putFile(imageUri)
                     .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl()
                             .addOnSuccessListener(uri -> {
                                 String imageUrl = uri.toString();
-                                String content=postContent.getText().toString();
-                                String idUser=auth.getUid();
+                                String content = postContent.getText().toString();
+                                String idUser = auth.getUid();
                                 ArrayList<comment> comments = new ArrayList<>();
                                 ArrayList<share> shares = new ArrayList<>();
-                                blog blog = new blog(idUser,content,imageUrl,comments,shares,0,System.currentTimeMillis(),System.currentTimeMillis());
+
                                 progressDialog.dismiss();
-                                database=FirebaseDatabase.getInstance();
-                                database.getReference().child("blogs").child(idUser).push().setValue(blog).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isComplete())
-                                        {
-                                            Toast.makeText(CreateBlog.this, "Đăng bài thành công", Toast.LENGTH_SHORT).show();
-                                            Intent it = new Intent(CreateBlog.this,HomeActivity.class);
-                                            startActivity(it);
-                                            finish();
-                                        }
-                                        else {
-                                            Toast.makeText(CreateBlog.this, "Đăng bài khong thành công", Toast.LENGTH_SHORT).show();
-                                        }
+                                database = FirebaseDatabase.getInstance();
+
+                                // Tạo tham chiếu blog với id tự động
+                                DatabaseReference blogRef = database.getReference().child("blogs").child(idUser).push();
+                                String idBlog = blogRef.getKey(); // Lấy id tự động được tạo bởi Firebase
+
+                                // Tạo đối tượng blog và gán id
+                                blog blog = new blog(idUser, content, imageUrl, comments, shares, 0, System.currentTimeMillis(), System.currentTimeMillis());
+                                blog.setId(idBlog); // Gán idBlog vào trường id của blog
+
+                                // Lưu blog vào Firebase
+                                blogRef.setValue(blog).addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(CreateBlog.this, "Đăng bài thành công", Toast.LENGTH_SHORT).show();
+                                        Intent it = new Intent(CreateBlog.this, HomeActivity.class);
+                                        startActivity(it);
+                                        finish();
+                                    } else {
+                                        Toast.makeText(CreateBlog.this, "Đăng bài không thành công", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                             }))
                     .addOnFailureListener(e -> Toast.makeText(CreateBlog.this, "Lỗi upload ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         }
     }
+
 }
