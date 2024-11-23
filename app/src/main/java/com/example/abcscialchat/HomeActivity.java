@@ -105,14 +105,10 @@ public class HomeActivity extends AppCompatActivity {
                 {
                     for (DataSnapshot blogSnapshot : dataSnapshot.getChildren()) {
                         blog dtblog = blogSnapshot.getValue(blog.class);
-                        // Kiểm tra nếu comments và shares không tồn tại thì khởi tạo mảng rỗng
-                        if (dtblog.getComments() == null) {
-                            dtblog.setComments(new ArrayList<comment>());
+                        if (dtblog != null) {
+                            blogArrayList.add(dtblog);
                         }
-                        if (dtblog.getShares() == null) {
-                            dtblog.setShares(new ArrayList<share>());
-                        }
-                        blogArrayList.add(dtblog);
+                        //blogArrayList.add(dtblog);
                     }
 
                 }

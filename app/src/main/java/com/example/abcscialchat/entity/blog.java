@@ -1,13 +1,14 @@
 package com.example.abcscialchat.entity;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class blog {
     String id;
     String uid;
     String content;
     String image;
-    ArrayList<comment> comments;
+    private Map<String, comment> comments;
     ArrayList<share> shares;
     int like;
     long timeCreate;
@@ -15,7 +16,7 @@ public class blog {
     public blog() {
     }
 
-    public blog(String uid, String content, String image, ArrayList<comment> comments, ArrayList<share> shares, int like, long timeCreate, long timeUpdate) {
+    public blog(String uid, String content, String image, Map<String, comment> comments, ArrayList<share> shares, int like, long timeCreate, long timeUpdate) {
         this.uid = uid;
         this.content = content;
         this.image = image;
@@ -58,11 +59,11 @@ public class blog {
         this.image = image;
     }
 
-    public ArrayList<comment> getComments() {
+    public Map<String, comment> getComments() {
         return comments;
     }
 
-    public void setComments(ArrayList<comment> comments) {
+    public void setComments(Map<String, comment> comments) {
         this.comments = comments;
     }
 

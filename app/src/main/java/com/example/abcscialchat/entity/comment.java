@@ -3,15 +3,17 @@ package com.example.abcscialchat.entity;
 public class comment {
     public String comment;
     public String time;
-    public String uid;
+    public String uidSender;
+    public String commentId;
 
-    public comment() {
-    }
-
-    public comment(String comment, String time, String uid) {
+    public comment(String comment, String time, String uidSender, String commentId) {
         this.comment = comment;
         this.time = time;
-        this.uid = uid;
+        this.uidSender = uidSender;
+        this.commentId = commentId;
+    }
+
+    public comment() {
     }
 
     public String getComment() {
@@ -30,11 +32,19 @@ public class comment {
         this.time = time;
     }
 
-    public String getUid() {
-        return uid;
+    public String getUidSender() {
+        return uidSender;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setUidSender(String uidSender) {
+        this.uidSender = uidSender;
+    }
+
+    public String getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(String commentId) {
+        this.commentId = commentId;
     }
 }

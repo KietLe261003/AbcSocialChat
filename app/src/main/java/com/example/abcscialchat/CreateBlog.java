@@ -34,6 +34,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CreateBlog extends AppCompatActivity {
 
@@ -113,7 +115,7 @@ public class CreateBlog extends AppCompatActivity {
                                 String imageUrl = uri.toString();
                                 String content = postContent.getText().toString();
                                 String idUser = auth.getUid();
-                                ArrayList<comment> comments = new ArrayList<>();
+                                Map<String, comment> comments = new HashMap<>();
                                 ArrayList<share> shares = new ArrayList<>();
 
                                 progressDialog.dismiss();

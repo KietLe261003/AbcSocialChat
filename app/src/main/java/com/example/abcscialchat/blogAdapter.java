@@ -98,9 +98,9 @@ public class blogAdapter extends RecyclerView.Adapter {
                 viewHoler.nameUser.setText(snapshot.child("userName").getValue().toString());
                 viewHoler.timeCreate.setText(formatMillisToDate(blogUser.getTimeCreate())+"");
                 viewHoler.contentPost.setText(blogUser.getContent());
-                viewHoler.shareCount.setText(blogUser.getShares().size()+"");
+                viewHoler.shareCount.setText(blogUser.getShares() != null ? blogUser.getShares().size() + "" : "0");
+                viewHoler.commentCount.setText(blogUser.getComments() != null ? blogUser.getComments().size() + "" : "0");
                 viewHoler.likeCount.setText(blogUser.getLike()+"");
-                viewHoler.commentCount.setText(blogUser.getComments().size()+"");
             }
 
             @Override
